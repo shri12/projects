@@ -1,0 +1,38 @@
+#include<iostream.h>
+#include<conio.h>
+#include<stdlib.h>
+void check(int b[],int n,int a)
+{
+ for(int j=0;j<n;j++)
+ {
+  if (b[j]==a)
+  cout<<"Congratulations!! You guessed the right number"<<endl<<"The right number that you guessed is"<<b[j]<<endl;
+  else
+  cout<<b[j]<<"is not correct"<<endl;
+  }
+  }
+void enter(int b[],int n)
+{cout<<"Enter three numbers";
+ for (int i=0;i<n;i++)
+ cin>>b[i];
+ }
+void main()
+{
+ clrscr();
+ int a;
+ char ans,y,n;
+ int b[3];
+ randomize();
+ do
+ {
+ cout<<"Welcome to the guessing game"<<endl;
+ cout<<"You have 3 chances to guess the number between 0-199"<<endl;
+ enter(b,3);
+ a=random(200);
+ check(b,3,a);
+ cout<<"Do you want to play again(y/n)";
+ cin>>ans;
+ }
+ while(ans=='y');
+ getch();
+ }
