@@ -1,0 +1,387 @@
+//Header files
+#include<fstream.h>
+#include<conio.h>
+#include<ctype.h>
+#include<stdio.h>
+#include<iomanip.h>
+
+//Class
+class account
+{
+   int acno;
+   char name[50];
+   float deposit;
+   char type;
+public:
+   void create();	//function to get data from user
+   void show();   	//function to display data
+   void modify();       //function to get new data from user
+   void dep(int);  	//function to accept amount and add to balance amount
+   void draw(int); 	//function to accept amount and subtract from balance amount
+   void report();  	//function to show data in tabular format
+   int racno();  	//function to return account number
+   int rdeposit();	//function to return balance amount
+   char rtype(); 	//function to return type of account
+};
+
+//Function prototypes
+
+void write();   	         //function to write records in binary file
+void displayac(int);   	         //function to display account details given by user
+void modifyaccount(int);	 //function to modify record in file
+void deleteaccount(int);	 //function to delete record from file
+void displayall();	       	 //function to display account details
+void depdraw(int, int);	  //function to desposit/withdraw amount for given account
+void search(int n);
+
+//Main function
+
+void main()
+{
+  clrscr();
+  int opt,opt1;
+  int num;
+  cout<<"WELCOME TO TSS BANKING MANAGEMENT SYSTEM"<<endl;
+    do
+    {
+       cout<<" MAIN MENU"<<endl;
+       cout<<" CHOOSE AN OPTION FROM MENU"<<endl;
+       cout<<" 1.ADMIN"<<endl;
+       cout<<" 2.TRANSACT"<<endl;
+       cout<<" 3.REPORTS"<<endl;
+       cout<<" 4.QUIT"<<endl;
+       cin>>opt;
+	switch (opt)
+	  {
+	    case 1: do
+		    {
+		     cout<<" 1. OPEN A NEW ACCOUNT"<<endl;
+		     cout<<" 2. CLOSE AN ACCOUNT"<<endl;
+		     cout<<" 3. MODIFY AN ACCOUNT"<<endl;
+		     cout<<" 4. SEARCH CUSTOMER"<<endl;
+		     cout<<" 5. MAIN MENU"<<endl;
+		     cin>>opt1;
+			switch (opt1)
+			  {
+			     case 1 :
+				       write();
+				       break;
+			     case 2 :
+				       cout<<"Enter The account No. : "; cin>>num;
+				       deleteaccount(num);
+				       break;
+			     case 3:
+				       cout<<"Enter The account No. : "; cin>>num;
+				       modifyaccount(num);
+				       break;
+
+			     case 4:
+				       cout<<"Enter The account No. : ";cin>>num;
+				       search(num);
+				       break;
+				       }
+			     }
+			     while (opt1!=5);
+		     break;
+	    case 2: do
+		    {
+		     cout<<" 1. DEPOSIT MONEY"<<endl;
+		     cout<<" 2. WITHDRAW MONEY"<<endl;
+		     cout<<" 3. MAIN MENU"<<endl;
+		     cin>>opt1;
+			 switch(opt1)
+			   {  case 1:
+				      cout<<"Enter The account No. : "; cin>>num;
+				      depdraw(num, 1);
+					break;
+			      case 2:
+				      cout<<"Enter The account No. : "; cin>>num;
+				      depdraw(num, 2);
+				      break;
+			      }
+		     }
+		     while(opt1!=3);
+		     break;
+	   case 3:
+		    do
+		     {
+		       cout<<" 1. BALANCE ENQUIRY"<<endl;
+		       cout<<" 2. ACCOUNT HOLDERS LIST"<<endl;
+		       cout<<" 3. MAIN MENU"<<endl;
+		       cin>>opt1;
+			   switch(opt1)
+			      {
+				case 1:
+					cout<<"Enter The account No. : "; cin>>num;
+					displayac(num);
+					break;
+				case 2:
+					displayall();
+					break;
+					}
+
+			    }  while(opt!=3);
+			    break;
+	   case 4:
+		    cout<<"THANK YOU FOR USING TSS BANKING MANAGEMENT SYSTEM"<<endl;
+		    break;
+
+	   default :
+		    cout<<"Wrong choice.Please try again.."<<endl;
+		    while(opt1!=3)
+		    break;
+		}
+	    }
+	   while(opt!=4);
+
+
+	  getch();
+    }
+
+void account::create()
+{
+   cout<<"Enter The Account No:"<<endl;
+   cin>>acno;
+   cout<<endl<<"Enter The Name of The Account Holder : ";
+   gets(name);
+   cout<<endl<<"Enter Type of The account (Current(C)/Savings(S)) : "<<endl;
+   cin>>type;
+   type=toupper(type);
+   cout<<endl<<"Enter The Initial Amount(more than 1000): "<<endl;
+   cin>>deposit;
+   cout<<"Account Created Successfully...."<<endl;
+
+}
+
+void account::show()
+{
+   cout<<endl;
+   cout<<"Account No.         : "<<acno<<endl;
+   cout<<"Account Holder Name : "<<name<<endl;
+   cout<<"Type of Account     : "<<type<<endl;
+   cout<<"Balance Amount      : "<<deposit<<endl;
+}
+
+void account::modify()
+{
+   cout<<"The Account No : "<<acno<<endl;
+   cout<<"Enter The Name of The Account Holder : "<<endl;
+   gets(name);
+   cout<<endl<<"Enter Type of The account Current(C) or Saving(S) : "<<endl;
+   cin>>type;
+   type=toupper(type);
+   cout<<endl<<"Enter The amount : "<<endl;
+   cin>>deposit;
+}
+
+void account::report()    //Account information for user
+{
+
+    cout<<acno<<setw(8)<<" "<<name<<setw(8)<<" "<<type<<setw(6)<<" "<<deposit<<endl;
+}
+
+void account::dep(int x)
+{
+      deposit+=x;
+}
+
+void account::draw(int x)
+{
+      deposit-=x;
+}
+
+
+
+int account::racno()
+{
+      return acno;
+}
+
+int account::rdeposit()
+{
+      return deposit;
+}
+
+char account::rtype()
+{
+      return type;
+}
+
+// entering account details on the date file
+
+void write()
+{
+    account ac;
+    ofstream f1;
+    f1.open("account.dat",ios::binary|ios::app);
+	ac.create();
+	f1.write((char *) &ac, sizeof(account));
+    f1.close();
+}
+
+//funtion to read binary file data
+
+void displayac(int n)
+{
+    account ac;
+    int found=0;
+    ifstream f2;
+    f2.open("account.dat",ios::binary);
+
+	cout<<endl<<"BALANCE DETAILS";
+	while(f2.read((char *) &ac, sizeof(account)))
+	{
+		if(ac.racno()==n)
+		{
+			ac.show();
+			found++;
+		}
+	}
+	f2.close();
+	if(found==0)
+	      {
+		cout<<endl;
+		cout<<"Account number does not exist";
+	      }
+}
+
+//To modify file records
+
+void modifyaccount(int n)
+{
+	int found=0;
+	account ac;
+	fstream File;
+	File.open("account.dat",ios::binary|ios::in|ios::out);
+
+	while(File.read((char *) &ac, sizeof(account)) && found==0)
+	{
+	   if(ac.racno()==n)
+		{
+		  ac.show();
+		  cout<<"Enter The New Details of account"<<endl;
+		  ac.modify();
+		  int pos=(-1)*sizeof(account);
+		  File.seekp(pos,ios::cur);
+		  File.write((char *) &ac, sizeof(account));
+		  cout<<endl;
+		  cout<<"Record Updated";
+		  found++;
+		}
+	}
+	File.close();
+	if(found==0)
+	      {	cout<<endl;
+		cout<<"Record Not Found ";
+	      }
+}
+//function to deposit and withdraw money
+
+void depdraw(int n, int option)
+{
+	int amt;
+	int found=0;
+	account ac;
+	fstream File;
+	File.open("account.dat", ios::binary|ios::in|ios::out);
+	while(File.read((char *) &ac, sizeof(account)) && found==0)
+	{
+	    if(ac.racno()==n)
+	    {
+		ac.show();
+		if(option==1)
+		 {
+			 cout<<endl;
+			 cout<<"TO DEPOSIT AMOUNT ";cout<<endl;
+			 cout<<"Enter The amount to be deposited";
+			 cin>>amt;
+			 ac.dep(amt);
+		 }
+		if(option==2)
+		 {
+			  cout<<endl;
+			  cout<<"TO WITHDRAW AMOUNT ";cout<<endl;
+			  cout<<"Enter The amount to be withdraw";
+			  cin>>amt;
+			  int bal=ac.rdeposit()-amt;
+			  if(bal<1000)
+			      cout<<"Insufficience balance";
+			  else
+			      ac.draw(amt);
+			}
+		 int pos=(-1)* sizeof(ac);
+		 File.seekp(pos,ios::cur);
+		 File.write((char *) &ac, sizeof(account));
+		 cout<<endl;
+		 cout<<"Record Updated";
+		 found++;
+	    }
+	}
+	File.close();
+	if(found==0)
+	       { cout<<endl;
+		 cout<<" Record Not Found "<<endl;
+	       }
+}
+
+
+//deleting records of file
+
+void deleteaccount(int n)
+{
+	account ac;
+	ifstream f2;
+	ofstream f1;
+	f2.open("account.dat",ios::binary);
+	f1.open("Temp.dat",ios::binary);
+	f2.seekg(0,ios::beg);
+	while(f2.read((char *) &ac, sizeof(account)))
+	{
+		if(ac.racno()!=n)
+		{
+			f1.write((char *) &ac, sizeof(account));
+		}
+	}
+	f2.close();
+	f1.close();
+	remove("account.dat");
+	rename("Temp.dat","account.dat");
+	cout<<"Record Deleted ..";
+}
+
+//displaying accounts list
+
+void displayall()
+{
+	account ac;
+	ifstream f2;
+	f2.open("account.dat",ios::binary);
+	cout<<endl<<endl;
+	cout<<"ACCOUNT HOLDERS LIST"<<endl;
+	cout<<"A/c no.      NAME       Type    Balance"<<endl;
+	while(f2.read((char *) &ac, sizeof(account)))
+	{
+		ac.report();
+	}
+	f2.close();
+}
+
+//To search for account details
+void search(int n)
+{
+ ifstream fil;
+ account ac;
+ int found=0;
+ fil.open("account.dat",ios::binary);
+ while (fil.read((char*)&ac,sizeof(ac)))
+  {
+   if(ac.racno()==n)
+   {
+    displayac(n);
+    found++;
+    }
+  }
+  if(found==0)
+   cout<<"Record Not Found"<<endl;
+   fil.close();
+   }
